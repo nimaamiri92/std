@@ -1,0 +1,36 @@
+version: "3.3"
+services:
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    restart: always
+    expose:
+      - "9000"
+    environment:
+      PHP_IDE_CONFIG: "serverName=mono-key"
+      XDEBUG_CONFIG: "client_host=172.17.0.1 xdebug.mode = develop,profile,gcstats,coverage,debug,trace xdebug.start_with_request=yes xdebug.idekey=mono-key"
+    volumes:
+      - ./:/var/www/html
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: homestead
+    ports:
+      - "3307:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mysql
+    expose:
+      - '80'
+      - '443'
+    environment:
+      - PMA_HOST=mysql
+    volumes:
+      - /sessions
+    ports:
+      - 8006:80
